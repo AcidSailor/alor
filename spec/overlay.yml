@@ -1,0 +1,326 @@
+overlay: 1.0.0
+x-speakeasy-jsonpath: rfc9535
+info:
+  title: Alor codegen patches
+  version: 0.1.0
+# Single overlay feeding oapi-codegen (spec-upstream.yml -> spec.yml ->
+# oapi-codegen -> models.gen.go). Two kinds of action: collapse the
+# response-format oneOf polymorphism (no union types emitted), and wire-type
+# fidelity patches so generated structs match what Alor returns / what
+# oapi-codegen v2 (kin-openapi) can digest.
+actions:
+  # --- Wire-type fidelity (oapi-codegen) -----------------------------------
+  # field_ComplexProductCategory: upstream declares `type: string` but lists enum
+  # members as JSON *numbers* (0..17) alongside "Unknown" and null. A string never
+  # equals a numeric member, so the MCP server's output validation rejected every
+  # real instrument (Alor sends the category as a string, e.g. "2"). Restate the
+  # members as strings so the enum agrees with `type` and the wire form.
+  # oapi-codegen already stringifies these into the FieldComplexProductCategory
+  # constants ("0".."17"), so models.gen.go is unaffected; only the JSON-Schema
+  # enum (thus spec-deref.json) changes. Remove the numeric enum first:
+  # speakeasy's `update` appends to arrays rather than replacing, so the string
+  # list below would otherwise be tacked onto the numeric members.
+  - target: $.components.schemas.field_ComplexProductCategory.enum
+    remove: true
+  - target: $.components.schemas.field_ComplexProductCategory
+    update:
+      enum:
+        - Unknown
+        - null
+        - "0"
+        - "1"
+        - "2"
+        - "3"
+        - "4"
+        - "5"
+        - "6"
+        - "7"
+        - "8"
+        - "9"
+        - "10"
+        - "11"
+        - "12"
+        - "13"
+        - "14"
+        - "15"
+        - "16"
+        - "17"
+
+  # Money/quantities/greeks: Alor tags every `number` as `format: decimal`, which
+  # oapi-codegen v2 cannot resolve (errors out) and would otherwise map to lossy
+  # float32. Point them at udecimal.Decimal — exact, lossless JSON decode (no
+  # float64 detour), the same decimal type the tinvest sibling uses.
+  #
+  # Also redeclare the JSON-Schema type as `string`: udecimal.Decimal *always*
+  # marshals to a quoted JSON string (MarshalJSON keeps the value exact, no float
+  # round-trip), so the wire form of these fields is a string even though Alor's
+  # own REST sends bare numbers. Leaving the schema as `number` made the MCP
+  # server's output validation reject the re-marshalled string ("has type string,
+  # want number") and drop the whole tool response; `string` describes what this
+  # client actually emits. The Go type is unaffected (x-go-type wins regardless of
+  # `type`), and decode still accepts both forms (udecimal.UnmarshalJSON strips
+  # optional quotes), so request bodies sharing these field_* components keep working.
+  - target: $..[?(@.type == 'number')]
+    update:
+      type: string
+      x-go-type: udecimal.Decimal
+      x-go-type-import:
+        name: udecimal
+        path: github.com/quagmt/udecimal
+
+  # Alor emits zone-less timestamps ("2026-06-18T00:00:00.0000000") and a .NET
+  # MaxValue "never expires" sentinel — neither parses as RFC3339, so time.Time
+  # would fail to decode. Point date-time fields at the hand-written alor.Time
+  # (lenient UnmarshalJSON). No import: Time is in-package.
+  - target: $..[?(@.format == 'date-time')]
+    update:
+      x-go-type: Time
+
+  # The lone `format: date` is the `dateFrom` query parameter (request input, not
+  # a response field). Left as-is, oapi-codegen maps it to openapi_types.Date,
+  # dragging in github.com/oapi-codegen/runtime/types — even models-only output
+  # emits the alias (QueryDateFromOptional). Point it at in-package alor.Time
+  # instead: keeps the package runtime-free and labels the alias with the scalar
+  # the facade encodes through. The hand-written WithDateFrom option (options.go)
+  # actually serialises the value via Time.MarshalText (UTC date-time); the
+  # generated alias is unused, so this is just type symmetry with the actions above.
+  - target: $..[?(@.format == 'date')]
+    update:
+      x-go-type: Time
+
+  # Order-group identifiers: use a strict UUID type, not a bare string. google/uuid
+  # keeps the package free of oapi-codegen/runtime (which openapi_types.UUID would
+  # pull in). Strictness is fine: responses carry Alor-issued GUIDs.
+  - target: $..[?(@.format == 'uuid')]
+    update:
+      x-go-type: uuid.UUID
+      x-go-type-import:
+        name: uuid
+        path: github.com/google/uuid
+
+  # FORTS portfolio id: upstream defines field_IdentifierPortfolio_FORTS as
+  # allOf[$ref field_IdentifierPortfolio_FOND, {example}]. The example-only second
+  # allOf member makes oapi-codegen emit a *struct* embedding the FOND string alias
+  # instead of a plain string alias — so decoding the bare-string `portfolio` Alor
+  # returns fails ("cannot unmarshal string into Go struct field ...FORTS").
+  # Flatten to a plain string, mirroring the FOND id.
+  - target: $.components.schemas.field_IdentifierPortfolio_FORTS.allOf
+    remove: true
+  - target: $.components.schemas.field_IdentifierPortfolio_FORTS
+    update:
+      type: string
+      example: 7500GHC
+      description: Уникальный идентификатор клиентского портфеля (FORTS)
+
+  # Order-action / order-group `message`: same allOf-string-alias defect as FORTS
+  # above. Upstream models every order-action `message` — and the order-group
+  # creation success `message` — as allOf[$ref field_Message (a string),
+  # {example}]. The example-only member makes oapi-codegen emit a *struct*
+  # embedding the field_Message string alias (`Message *struct{ FieldMessage
+  # \`yaml:",inline"\` }`) instead of a plain *string — so decoding the bare-string
+  # `message` Alor returns on a successful (or duplicate-REQID) action / group
+  # creation fails ("cannot unmarshal string into Go struct field ...message").
+  # Flatten each to the plain field_Message $ref, dropping the example-only member.
+  - target: $.components.schemas.response_OrderActionLimitMarket.properties.message.allOf
+    remove: true
+  - target: $.components.schemas.response_OrderActionLimitMarket.properties.message
+    update:
+      $ref: '#/components/schemas/field_Message'
+
+  - target: $.components.schemas.response_OrderActionLimitMarket_CommandAPI.properties.message.allOf
+    remove: true
+  - target: $.components.schemas.response_OrderActionLimitMarket_CommandAPI.properties.message
+    update:
+      $ref: '#/components/schemas/field_Message'
+
+  - target: $.components.schemas.response_OrderActionCode400.properties.message.allOf
+    remove: true
+  - target: $.components.schemas.response_OrderActionCode400.properties.message
+    update:
+      $ref: '#/components/schemas/field_Message'
+
+  - target: $.components.schemas.response_OrderActionCode400_CommandAPI.properties.message.allOf
+    remove: true
+  - target: $.components.schemas.response_OrderActionCode400_CommandAPI.properties.message
+    update:
+      $ref: '#/components/schemas/field_Message'
+
+  - target: $.components.schemas.response_OrderActionCode400_CommandAPI.properties.oldResponse.properties.body.properties.message.allOf
+    remove: true
+  - target: $.components.schemas.response_OrderActionCode400_CommandAPI.properties.oldResponse.properties.body.properties.message
+    update:
+      $ref: '#/components/schemas/field_Message'
+
+  - target: $.components.schemas.response_OrderActionStopProfitLoss.properties.message.allOf
+    remove: true
+  - target: $.components.schemas.response_OrderActionStopProfitLoss.properties.message
+    update:
+      $ref: '#/components/schemas/field_Message'
+
+  - target: $.components.schemas.response_OrderActionStopProfitLoss_CommandAPI.properties.message.allOf
+    remove: true
+  - target: $.components.schemas.response_OrderActionStopProfitLoss_CommandAPI.properties.message
+    update:
+      $ref: '#/components/schemas/field_Message'
+
+  - target: $.components.schemas.response_OrderGroupCreationSuccess.properties.message.allOf
+    remove: true
+  - target: $.components.schemas.response_OrderGroupCreationSuccess.properties.message
+    update:
+      $ref: '#/components/schemas/field_Message'
+
+  # --- Drop the WebSocket subscription surface -----------------------------
+  # Alor models WS/CWS subscriptions as `trace:` operations on whitespace-padded
+  # `/ws   ` and `/cws   ` path keys — the only trace operations in the spec.
+  # WebSocket is out of scope (REST only; see CLAUDE.md), and the
+  # oneOf(_Simple,_Slim,_Heavy) bodies of their `ws_Subscription_*` responses
+  # would otherwise make oapi-codegen emit json.RawMessage unions backed by
+  # github.com/oapi-codegen/runtime. Removing the trace operations leaves those
+  # responses and every `ws_*` schema unreferenced, so the pruner
+  # (oapi-codegen.yaml skip-prune: false) drops the whole subgraph: no unions, no
+  # runtime dependency, no dead ws structs. One filter matches every trace path
+  # item, so the 27 space-padded keys need not be enumerated.
+  - target: $.paths[?@.trace]
+    remove: true
+
+  # --- Drop the deprecated surface --------------------------------------------
+  # 13 deprecated operations (legacy money, md/stats history-trades, the non-Limit
+  # warptrans stopLoss/takeProfit actions, DELETE warptrans order, status). None is
+  # reachable from the facade. Removing them leaves their response schemas
+  # unreferenced; the pruner (oapi-codegen.yaml skip-prune: false) drops them.
+  # Deprecated component schemas (flag_Snapshot_Deprecated, field_*_Deprecated) are
+  # only referenced by _Simple/_Slim variants (themselves pruned), so they
+  # disappear from codegen output without explicit removal.
+  - target: $.paths.*[?@.deprecated == true]
+    remove: true
+
+  # --- Collapse response-format polymorphism (oneOf -> Heavy) --------------
+  # Every response_X = oneOf(_Simple, _Slim, _Heavy) collapses to just _Heavy.
+  # The variants differ by field-naming scheme, selected by the request's ?format=
+  # parameter. No wire-level discriminator, so the polymorphism is undecodable.
+  # Heavy is the superset; the facade pins format=Heavy and hides the param from callers.
+  - target: $.components.responses['200_AllTrades'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_AllTrades'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_AllTrades_Heavy"
+
+  - target: $.components.responses['200_AllTradesHistory'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_AllTradesHistory'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_AllTradesHistory_Heavy"
+
+  - target: $.components.responses['200_FortsRisk'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_FortsRisk'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_FortsRisk_Heavy"
+
+  - target: $.components.responses['200_Futures'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Futures'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Futures_Heavy"
+
+  - target: $.components.responses['200_History'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_History'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_History_Heavy"
+
+  - target: $.components.responses['200_Money'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Money'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Money_Heavy"
+
+  - target: $.components.responses['200_Order'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Order'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Order_Heavy"
+
+  - target: $.components.responses['200_OrderBook'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_OrderBook'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_OrderBook_Heavy"
+
+  - target: $.components.responses['200_Orders'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Orders'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Orders_Heavy"
+
+  - target: $.components.responses['200_Position'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Position'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Position_Heavy"
+
+  - target: $.components.responses['200_Positions'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Positions'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Positions_Heavy"
+
+  - target: $.components.responses['200_Risk'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Risk'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Risk_Heavy"
+
+  - target: $.components.responses['200_Securities'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Securities'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Securities_Heavy"
+
+  - target: $.components.responses['200_Security'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Security'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Security_Heavy"
+
+  - target: $.components.responses['200_StopOrder_Warp'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_StopOrder_Warp'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_StopOrder_Warp_Heavy"
+
+  - target: $.components.responses['200_StopOrders_Warp'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_StopOrders_Warp'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_StopOrders_Warp_Heavy"
+
+  - target: $.components.responses['200_Summary'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Summary'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Summary_Heavy"
+
+  - target: $.components.responses['200_Symbols'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Symbols'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Symbols_Heavy"
+
+  - target: $.components.responses['200_Trades'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Trades'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Trades_Heavy"
+
+  - target: $.components.responses['200_Trades_V2'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_Trades_V2'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_Trades_V2_Heavy"
+
+  - target: $.components.responses['200_TradingSession'].content['application/json'].schema.oneOf
+    remove: true
+  - target: $.components.responses['200_TradingSession'].content['application/json'].schema
+    update:
+      $ref: "#/components/schemas/response_TradingSession_Heavy"

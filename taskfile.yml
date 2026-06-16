@@ -1,0 +1,108 @@
+version: "3"
+
+vars:
+  SPEAKEASY_IMAGE: ghcr.io/speakeasy-api/speakeasy:latest
+  REDOCLY_IMAGE: ghcr.io/redocly/cli:latest
+  OAPI_CODEGEN: github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.5.0
+
+tasks:
+  spec:
+    desc: Download the upstream Alor OpenAPI spec (committed verbatim)
+    cmds:
+      - curl -fsSL https://alor.dev/rawdocs2/WarpOpenAPIv2.yml -o spec/spec-upstream.yml
+
+  overlay:
+    desc: Apply spec/overlay.yml to the upstream spec, producing spec/spec.yml
+    cmds:
+      - >
+        docker run --rm -v "$PWD/spec:/work" {{.SPEAKEASY_IMAGE}}
+        overlay apply
+        -s /work/spec-upstream.yml
+        -o /work/overlay.yml
+        --strict
+        > spec/spec.yml
+    sources:
+      - spec/spec-upstream.yml
+      - spec/overlay.yml
+    generates:
+      - spec/spec.yml
+
+  deref:
+    desc: Dereference spec/spec.yml -> spec/spec-deref.json (MCP branch; embedded by spec/spec.go)
+    deps:
+      - overlay
+    cmds:
+      # bundle --dereferenced inlines every $ref while retaining
+      # components.schemas (no --remove-unused-components), so a name->schema
+      # lookup still works downstream. Derefed from the overlaid spec.yml (not
+      # upstream), so the MCP document mirrors the facade: WebSocket and deprecated
+      # ops dropped, oneOf responses collapsed to Heavy. The .json extension
+      # converts the YAML input to JSON for the consumer's encoding/json path.
+      - >
+        docker run --rm -v "$PWD/spec:/work" {{.REDOCLY_IMAGE}}
+        bundle /work/spec.yml -o /work/spec-deref.json --dereferenced
+    sources:
+      - spec/spec.yml
+    generates:
+      - spec/spec-deref.json
+
+  gen:
+    desc: Generate plain-struct models into models.gen.go (fails on any oapi-codegen warning)
+    deps:
+      - overlay
+    cmds:
+      - |
+        out=$(go run {{.OAPI_CODEGEN}} \
+          -config oapi-codegen.yaml spec/spec.yml 2>&1)
+        echo "$out"
+        # oapi-codegen prefixes diagnostics with "warning:"; treat any as fatal
+        # so a new spec quirk can't slip through unnoticed.
+        if echo "$out" | grep -iqE 'warn'; then
+          echo "FAIL: oapi-codegen emitted warnings — refusing to accept generated code" >&2
+          exit 1
+        fi
+        exit 0  # else-less `if` leaks grep's non-zero status under Task's sh; pin success.
+      - gofmt -w models.gen.go
+
+  tidy:
+    desc: Tidy go.mod
+    cmds:
+      - go mod tidy
+
+  lint:
+    desc: Run formatters + linters with autofix (mutates files)
+    cmds:
+      - golangci-lint fmt
+      - golangci-lint run --fix
+
+  ci:
+    desc: Read-only fmt + lint verification for CI (fail-fast)
+    cmds:
+      - golangci-lint fmt --diff
+      - golangci-lint run
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test ./...
+
+  check:
+    desc: Local composite — lint (mutating) + tests
+    cmds:
+      - task: lint
+      - task: test
+
+  build:
+    desc: Local snapshot release (validates GoReleaser config; no publish)
+    cmds:
+      - goreleaser release --snapshot --clean --skip=publish
+
+  release:
+    desc: Tagged release via GoReleaser — GitHub Release + changelog (CI)
+    cmds:
+      - goreleaser release --clean
+
+  update:
+    desc: Pull latest go-scaffolds v1 template tooling (3-way merge; source untouched)
+    cmds:
+      - uvx copier update --vcs-ref v1

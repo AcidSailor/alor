@@ -1,0 +1,20 @@
+# oapi-codegen v2 config — plain-struct models only, into the public alor
+# package. Run via the Taskfile `gen` target. The hand-written transport
+# (client.go) and facade (wrappers.go) share the package and reference these
+# generated types directly.
+package: alor
+output: models.gen.go
+generate:
+  models: true
+compatibility:
+  # Alor's spec uses `allOf: [$ref base, {example: N}]` to attach per-use examples
+  # (field_HTTPCode200/400/401, …). oapi-codegen v2's default allOf merger rejects
+  # these ("can not merge incompatible formats"); the legacy merger flattens them
+  # without the strict format check.
+  old-merge-schemas: true
+output-options:
+  # Prune schemas not reachable from an operation. The overlay strips the
+  # WebSocket `trace:` operations, leaving the entire `ws_*` subgraph (~5k lines of
+  # unused structs) unreferenced; pruning drops it. The REST response_*_Heavy types
+  # stay, reachable through their GET operations.
+  skip-prune: false
