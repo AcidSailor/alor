@@ -144,5 +144,3 @@ oapi-codegen input only, not embedded.
 - Out of scope: WebSocket/streaming, `?format=Slim`/`Simple`, OAuth code-flow
   bootstrap (callers use `oauth2.Config.Exchange` and feed the `refresh_token`
   to `auth.New`), GraphQL.
-- `replace github.com/acidsailor/restkit => ../restkit` in `go.mod` — restkit is
-  a sibling local module.
