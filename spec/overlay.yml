@@ -20,6 +20,11 @@ actions:
   # enum (thus spec-deref.json) changes. Remove the numeric enum first:
   # speakeasy's `update` appends to arrays rather than replacing, so the string
   # list below would otherwise be tacked onto the numeric members.
+  #
+  # The empty string "" is also a member: the field's own description documents
+  # `` as "Нет ограничений" (no restrictions), and Alor sends it for MOEX ETFs
+  # such as LQDT/TQTF. Upstream omitted it from the enum, so output validation
+  # dropped every such instrument until "" was added here.
   - target: $.components.schemas.field_ComplexProductCategory.enum
     remove: true
   - target: $.components.schemas.field_ComplexProductCategory
@@ -27,6 +32,7 @@ actions:
       enum:
         - Unknown
         - null
+        - ""
         - "0"
         - "1"
         - "2"

@@ -22,6 +22,7 @@ const (
 
 // Defines values for FieldComplexProductCategory.
 const (
+	Empty       FieldComplexProductCategory = ""
 	LessThannil FieldComplexProductCategory = "<nil>"
 	N0          FieldComplexProductCategory = "0"
 	N1          FieldComplexProductCategory = "1"
