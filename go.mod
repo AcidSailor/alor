@@ -3,7 +3,7 @@ module github.com/acidsailor/alor
 go 1.26
 
 require (
-	github.com/acidsailor/restkit v0.1.2
+	github.com/acidsailor/restkit v0.1.3
 	github.com/google/uuid v1.6.0
 	github.com/quagmt/udecimal v1.10.1
 	github.com/stretchr/testify v1.11.1
