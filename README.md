@@ -61,8 +61,8 @@ func main() {
 	}
 
 	query := "SBER"
-	securities, err := c.SearchSecurities(context.Background(),
-		alor.SearchSecuritiesParams{Query: &query})
+	securities, err := c.MarketData.Search(context.Background(),
+		alor.MarketDataSearchRequest{Query: &query})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,8 +70,11 @@ func main() {
 }
 ```
 
-Each method takes a context plus a single `XxxParams` struct — required fields
-as values, optional query filters as pointers (nil omits the parameter).
+Operations are grouped into service facades on the client (`c.Orders`, `c.StopOrders`, `c.OrderGroups`, `c.Portfolio`, `c.Trades`,
+`c.MarketData`). Each method takes a context plus a single `XxxRequest` struct
+— required fields as values, optional query filters as pointers (nil omits the
+parameter) — and returns a pointer to the response (`*T`; collections are
+`[]T`). `c.ServerTime` stays a top-level method.
 
 ### Placing an order
 
@@ -80,7 +83,7 @@ unique value per command and reuse it on retries so a resend cannot
 double-submit.
 
 ```go
-resp, err := c.PlaceLimitOrder(ctx, alor.PlaceLimitOrderParams{
+resp, err := c.Orders.PlaceLimit(ctx, alor.OrdersPlaceLimitRequest{
 	ReqID: uuid.NewString(),
 	Order: order, // alor.OrdersActionsLimitTVPost
 })
