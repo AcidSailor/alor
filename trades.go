@@ -21,9 +21,9 @@ type TradesGetRequest struct {
 func (s *tradesService) Get(
 	ctx context.Context,
 	params TradesGetRequest,
-) (*ResponseTradesV2Heavy, error) {
+) (ResponseTradesV2Heavy, error) {
 	q := heavyValues().Bool(keyWithRepo, params.WithRepo)
-	return do[*ResponseTradesV2Heavy](ctx, s.c, http.MethodGet,
+	return do[ResponseTradesV2Heavy](ctx, s.c, http.MethodGet,
 		clientPath(params.Exchange, params.Portfolio, "/trades"), q, nil)
 }
 
@@ -41,14 +41,14 @@ type TradesSymbolRequest struct {
 func (s *tradesService) Symbol(
 	ctx context.Context,
 	params TradesSymbolRequest,
-) (*ResponseTradesV2Heavy, error) {
+) (ResponseTradesV2Heavy, error) {
 	path := clientPath(
 		params.Exchange,
 		params.Portfolio,
 		restkit.Pathf("/%s/trades", params.Symbol),
 	)
 	q := heavyValues().Str(keyInstrumentGroup, params.InstrumentGroup)
-	return do[*ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
+	return do[ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
 }
 
 // TradesHistoryRequest selects the exchange/portfolio and the optional
@@ -71,7 +71,7 @@ type TradesHistoryRequest struct {
 func (s *tradesService) History(
 	ctx context.Context,
 	params TradesHistoryRequest,
-) (*ResponseTradesV2Heavy, error) {
+) (ResponseTradesV2Heavy, error) {
 	path := restkit.Pathf(
 		"/md/v2/Stats/%s/%s/history/trades",
 		params.Exchange,
@@ -87,7 +87,7 @@ func (s *tradesService) History(
 		Bool(keyWithRepo, params.WithRepo).
 		Str(keySide, params.Side)
 	q = setTime(q, keyDateFrom, params.DateFrom)
-	return do[*ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
+	return do[ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
 }
 
 // TradesSymbolHistoryRequest selects the single-symbol trade history and the
@@ -111,7 +111,7 @@ type TradesSymbolHistoryRequest struct {
 func (s *tradesService) SymbolHistory(
 	ctx context.Context,
 	params TradesSymbolHistoryRequest,
-) (*ResponseTradesV2Heavy, error) {
+) (ResponseTradesV2Heavy, error) {
 	path := restkit.Pathf(
 		"/md/v2/Stats/%s/%s/history/trades/%s",
 		params.Exchange,
@@ -127,7 +127,7 @@ func (s *tradesService) SymbolHistory(
 		Bool(keyWithRepo, params.WithRepo).
 		Str(keySide, params.Side)
 	q = setTime(q, keyDateFrom, params.DateFrom)
-	return do[*ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
+	return do[ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
 }
 
 // TradesAllRequest selects the instrument and the optional public-tape
