@@ -3,7 +3,6 @@ package alor
 import (
 	"context"
 	"net/http"
-	"net/url"
 
 	"github.com/acidsailor/restkit"
 )
@@ -75,7 +74,7 @@ func (s *portfolioService) Position(
 	path := clientPath(
 		params.Exchange,
 		params.Portfolio,
-		"/positions/"+url.PathEscape(params.Symbol),
+		restkit.Pathf("/positions/%s", params.Symbol),
 	)
 	return do[*ResponsePositionHeavy](ctx, s.c, http.MethodGet,
 		path, heavyValues(), nil)
@@ -94,7 +93,7 @@ func (s *portfolioService) PositionsByLogin(
 	ctx context.Context,
 	params PortfolioPositionsByLoginRequest,
 ) (*ResponsePositionsHeavy, error) {
-	path := "/md/v2/Clients/" + url.PathEscape(params.Login) + "/positions"
+	path := restkit.Pathf("/md/v2/Clients/%s/positions", params.Login)
 	q := heavyValues().Bool(keyWithoutCurrency, params.WithoutCurrency)
 	return do[*ResponsePositionsHeavy](ctx, s.c, http.MethodGet, path, q, nil)
 }

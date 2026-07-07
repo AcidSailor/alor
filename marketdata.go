@@ -3,7 +3,6 @@ package alor
 import (
 	"context"
 	"net/http"
-	"net/url"
 
 	"github.com/acidsailor/restkit"
 )
@@ -50,7 +49,7 @@ func (s *marketDataService) SecuritiesByExchange(
 		Int(keyOffset, params.Offset).
 		Bool(keyIncludeNonBaseBoards, params.IncludeNonBaseBoards)
 	return do[*ResponseSecuritiesHeavy](ctx, s.c, http.MethodGet,
-		"/md/v2/Securities/"+url.PathEscape(params.Exchange), q, nil)
+		restkit.Pathf("/md/v2/Securities/%s", params.Exchange), q, nil)
 }
 
 // MarketDataSecurityRequest selects the single instrument and an optional
@@ -66,8 +65,11 @@ func (s *marketDataService) Security(
 	ctx context.Context,
 	params MarketDataSecurityRequest,
 ) (*ResponseSecurityHeavy, error) {
-	path := "/md/v2/Securities/" + url.PathEscape(params.Exchange) +
-		"/" + url.PathEscape(params.Symbol)
+	path := restkit.Pathf(
+		"/md/v2/Securities/%s/%s",
+		params.Exchange,
+		params.Symbol,
+	)
 	q := heavyValues().Str(keyInstrumentGroup, params.InstrumentGroup)
 	return do[*ResponseSecurityHeavy](ctx, s.c, http.MethodGet, path, q, nil)
 }
@@ -83,8 +85,11 @@ func (s *marketDataService) Boards(
 	ctx context.Context,
 	params MarketDataBoardsRequest,
 ) (*ResponseAvailableBoards, error) {
-	path := "/md/v2/Securities/" + url.PathEscape(params.Exchange) +
-		"/" + url.PathEscape(params.Symbol) + "/availableBoards"
+	path := restkit.Pathf(
+		"/md/v2/Securities/%s/%s/availableBoards",
+		params.Exchange,
+		params.Symbol,
+	)
 	return do[*ResponseAvailableBoards](ctx, s.c, http.MethodGet,
 		path, restkit.NewValues(), nil)
 }
@@ -100,8 +105,11 @@ func (s *marketDataService) FuturesQuote(
 	ctx context.Context,
 	params MarketDataFuturesQuoteRequest,
 ) (*ResponseFuturesHeavy, error) {
-	path := "/md/v2/Securities/" + url.PathEscape(params.Exchange) +
-		"/" + url.PathEscape(params.Symbol) + "/actualFuturesQuote"
+	path := restkit.Pathf(
+		"/md/v2/Securities/%s/%s/actualFuturesQuote",
+		params.Exchange,
+		params.Symbol,
+	)
 	return do[*ResponseFuturesHeavy](ctx, s.c, http.MethodGet,
 		path, heavyValues(), nil)
 }
@@ -117,7 +125,7 @@ func (s *marketDataService) Quotes(
 	ctx context.Context,
 	params MarketDataQuotesRequest,
 ) (*ResponseSymbolsHeavy, error) {
-	path := "/md/v2/Securities/" + url.PathEscape(params.Symbols) + "/quotes"
+	path := restkit.Pathf("/md/v2/Securities/%s/quotes", params.Symbols)
 	return do[*ResponseSymbolsHeavy](ctx, s.c, http.MethodGet,
 		path, heavyValues(), nil)
 }
@@ -144,8 +152,11 @@ func (s *marketDataService) OrderBook(
 	ctx context.Context,
 	params MarketDataOrderBookRequest,
 ) (*ResponseOrderBookHeavy, error) {
-	path := "/md/v2/orderbooks/" + url.PathEscape(params.Exchange) +
-		"/" + url.PathEscape(params.Symbol)
+	path := restkit.Pathf(
+		"/md/v2/orderbooks/%s/%s",
+		params.Exchange,
+		params.Symbol,
+	)
 	q := heavyValues().
 		Str(keyInstrumentGroup, params.InstrumentGroup).
 		Int(keyDepth, params.Depth)

@@ -3,7 +3,8 @@ package alor
 import (
 	"context"
 	"net/http"
-	"net/url"
+
+	"github.com/acidsailor/restkit"
 )
 
 // tradesService groups the Trades API operations. Obtain it via Client.Trades.
@@ -44,7 +45,7 @@ func (s *tradesService) Symbol(
 	path := clientPath(
 		params.Exchange,
 		params.Portfolio,
-		"/"+url.PathEscape(params.Symbol)+"/trades",
+		restkit.Pathf("/%s/trades", params.Symbol),
 	)
 	q := heavyValues().Str(keyInstrumentGroup, params.InstrumentGroup)
 	return do[*ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
@@ -71,8 +72,11 @@ func (s *tradesService) History(
 	ctx context.Context,
 	params TradesHistoryRequest,
 ) (*ResponseTradesV2Heavy, error) {
-	path := "/md/v2/Stats/" + url.PathEscape(params.Exchange) +
-		"/" + url.PathEscape(params.Portfolio) + "/history/trades"
+	path := restkit.Pathf(
+		"/md/v2/Stats/%s/%s/history/trades",
+		params.Exchange,
+		params.Portfolio,
+	)
 	q := heavyValues().
 		Str(keyInstrumentGroup, params.InstrumentGroup).
 		Str(keyTicker, params.Ticker).
@@ -108,9 +112,12 @@ func (s *tradesService) SymbolHistory(
 	ctx context.Context,
 	params TradesSymbolHistoryRequest,
 ) (*ResponseTradesV2Heavy, error) {
-	path := "/md/v2/Stats/" + url.PathEscape(params.Exchange) +
-		"/" + url.PathEscape(params.Portfolio) + "/history/trades/" +
-		url.PathEscape(params.Symbol)
+	path := restkit.Pathf(
+		"/md/v2/Stats/%s/%s/history/trades/%s",
+		params.Exchange,
+		params.Portfolio,
+		params.Symbol,
+	)
 	q := heavyValues().
 		Str(keyInstrumentGroup, params.InstrumentGroup).
 		Int64(keyFrom, params.From).
@@ -149,8 +156,11 @@ func (s *tradesService) All(
 	ctx context.Context,
 	params TradesAllRequest,
 ) (*ResponseAllTradesHeavy, error) {
-	path := "/md/v2/Securities/" + url.PathEscape(params.Exchange) +
-		"/" + url.PathEscape(params.Symbol) + "/alltrades"
+	path := restkit.Pathf(
+		"/md/v2/Securities/%s/%s/alltrades",
+		params.Exchange,
+		params.Symbol,
+	)
 	q := heavyValues().
 		Str(keyInstrumentGroup, params.InstrumentGroup).
 		Int64(keyFrom, params.From).
@@ -187,8 +197,11 @@ func (s *tradesService) AllHistory(
 	ctx context.Context,
 	params TradesAllHistoryRequest,
 ) (*ResponseAllTradesHistoryHeavy, error) {
-	path := "/md/v2/Securities/" + url.PathEscape(params.Exchange) +
-		"/" + url.PathEscape(params.Symbol) + "/alltrades/history"
+	path := restkit.Pathf(
+		"/md/v2/Securities/%s/%s/alltrades/history",
+		params.Exchange,
+		params.Symbol,
+	)
 	q := heavyValues().
 		Int(keyLimit, &params.Limit).
 		Str(keyInstrumentGroup, params.InstrumentGroup).

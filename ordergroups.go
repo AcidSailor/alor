@@ -3,7 +3,6 @@ package alor
 import (
 	"context"
 	"net/http"
-	"net/url"
 
 	"github.com/acidsailor/restkit"
 )
@@ -30,7 +29,7 @@ func (s *orderGroupsService) Get(
 	params OrderGroupsGetRequest,
 ) (*ResponseOrderGroupInfo, error) {
 	return do[*ResponseOrderGroupInfo](ctx, s.c, http.MethodGet,
-		"/commandapi/api/orderGroups/"+url.PathEscape(params.OrderGroupID),
+		restkit.Pathf("/commandapi/api/orderGroups/%s", params.OrderGroupID),
 		restkit.NewValues(), nil)
 }
 
@@ -62,7 +61,7 @@ func (s *orderGroupsService) Update(
 	ctx context.Context,
 	params OrderGroupsUpdateRequest,
 ) error {
-	path := "/commandapi/api/orderGroups/" + url.PathEscape(params.OrderGroupID)
+	path := restkit.Pathf("/commandapi/api/orderGroups/%s", params.OrderGroupID)
 	return exec(
 		ctx,
 		s.c,
@@ -84,6 +83,6 @@ func (s *orderGroupsService) Delete(
 	ctx context.Context,
 	params OrderGroupsDeleteRequest,
 ) error {
-	path := "/commandapi/api/orderGroups/" + url.PathEscape(params.OrderGroupID)
+	path := restkit.Pathf("/commandapi/api/orderGroups/%s", params.OrderGroupID)
 	return exec(ctx, s.c, http.MethodDelete, path, restkit.NewValues(), nil)
 }

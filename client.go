@@ -9,7 +9,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"net/url"
 
 	"github.com/acidsailor/restkit"
 	"golang.org/x/oauth2"
@@ -211,8 +210,7 @@ func exec(
 // clientPath builds the /md/v2/Clients/{exchange}/{portfolio}/<suffix> path,
 // escaping the path parameters.
 func clientPath(exchange, portfolio, suffix string) string {
-	return "/md/v2/Clients/" + url.PathEscape(exchange) +
-		"/" + url.PathEscape(portfolio) + suffix
+	return restkit.Pathf("/md/v2/Clients/%s/%s", exchange, portfolio) + suffix
 }
 
 // ServerTime returns Alor's current server time as a Unix timestamp (seconds).
