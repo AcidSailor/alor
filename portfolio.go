@@ -36,8 +36,8 @@ type PortfolioPositionsRequest struct {
 func (s *portfolioService) Positions(
 	ctx context.Context,
 	params PortfolioPositionsRequest,
-) (*ResponsePositionsHeavy, error) {
-	return do[*ResponsePositionsHeavy](ctx, s.c, http.MethodGet,
+) (ResponsePositionsHeavy, error) {
+	return do[ResponsePositionsHeavy](ctx, s.c, http.MethodGet,
 		clientPath(params.Exchange, params.Portfolio, "/positions"),
 		heavyValues(), nil)
 }
@@ -92,10 +92,10 @@ type PortfolioPositionsByLoginRequest struct {
 func (s *portfolioService) PositionsByLogin(
 	ctx context.Context,
 	params PortfolioPositionsByLoginRequest,
-) (*ResponsePositionsHeavy, error) {
+) (ResponsePositionsHeavy, error) {
 	path := restkit.Pathf("/md/v2/Clients/%s/positions", params.Login)
 	q := heavyValues().Bool(keyWithoutCurrency, params.WithoutCurrency)
-	return do[*ResponsePositionsHeavy](ctx, s.c, http.MethodGet, path, q, nil)
+	return do[ResponsePositionsHeavy](ctx, s.c, http.MethodGet, path, q, nil)
 }
 
 // PortfolioFortsRiskRequest selects the exchange/portfolio whose FORTS risk to return.

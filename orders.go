@@ -24,8 +24,8 @@ type OrdersListRequest struct {
 func (s *ordersService) List(
 	ctx context.Context,
 	params OrdersListRequest,
-) (*ResponseOrdersHeavy, error) {
-	return do[*ResponseOrdersHeavy](ctx, s.c, http.MethodGet,
+) (ResponseOrdersHeavy, error) {
+	return do[ResponseOrdersHeavy](ctx, s.c, http.MethodGet,
 		clientPath(params.Exchange, params.Portfolio, "/orders"),
 		heavyValues(), nil)
 }
@@ -153,8 +153,8 @@ type OrdersEstimateBatchRequest struct {
 func (s *ordersService) EstimateBatch(
 	ctx context.Context,
 	params OrdersEstimateBatchRequest,
-) (*ResponseEstimateOrders, error) {
-	return do[*ResponseEstimateOrders](ctx, s.c, http.MethodPost,
+) (ResponseEstimateOrders, error) {
+	return do[ResponseEstimateOrders](ctx, s.c, http.MethodPost,
 		ordersBase+"/estimate/all", restkit.NewValues(), params.Orders)
 }
 

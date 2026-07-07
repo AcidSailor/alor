@@ -155,7 +155,7 @@ type TradesAllRequest struct {
 func (s *tradesService) All(
 	ctx context.Context,
 	params TradesAllRequest,
-) (*ResponseAllTradesHeavy, error) {
+) (ResponseAllTradesHeavy, error) {
 	path := restkit.Pathf(
 		"/md/v2/Securities/%s/%s/alltrades",
 		params.Exchange,
@@ -176,7 +176,7 @@ func (s *tradesService) All(
 		Int(keyTake, params.Take).
 		Bool(keyDescending, params.Descending).
 		Bool(keyIncludeVirtualTrades, params.IncludeVirtualTrades)
-	return do[*ResponseAllTradesHeavy](ctx, s.c, http.MethodGet, path, q, nil)
+	return do[ResponseAllTradesHeavy](ctx, s.c, http.MethodGet, path, q, nil)
 }
 
 // TradesAllHistoryRequest selects the instrument, the required Limit cap, and
