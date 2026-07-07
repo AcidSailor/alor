@@ -20,9 +20,9 @@ type MarketDataSearchRequest struct {
 func (s *marketDataService) Search(
 	ctx context.Context,
 	params MarketDataSearchRequest,
-) (*ResponseSecuritiesHeavy, error) {
+) (ResponseSecuritiesHeavy, error) {
 	q := heavyValues().Str(keyQuery, params.Query)
-	return do[*ResponseSecuritiesHeavy](ctx, s.c, http.MethodGet,
+	return do[ResponseSecuritiesHeavy](ctx, s.c, http.MethodGet,
 		"/md/v2/Securities", q, nil)
 }
 
@@ -41,14 +41,14 @@ type MarketDataSecuritiesByExchangeRequest struct {
 func (s *marketDataService) SecuritiesByExchange(
 	ctx context.Context,
 	params MarketDataSecuritiesByExchangeRequest,
-) (*ResponseSecuritiesHeavy, error) {
+) (ResponseSecuritiesHeavy, error) {
 	q := heavyValues().
 		Str(keyMarket, params.Market).
 		Bool(keyIncludeOld, params.IncludeOld).
 		Int(keyLimit, params.Limit).
 		Int(keyOffset, params.Offset).
 		Bool(keyIncludeNonBaseBoards, params.IncludeNonBaseBoards)
-	return do[*ResponseSecuritiesHeavy](ctx, s.c, http.MethodGet,
+	return do[ResponseSecuritiesHeavy](ctx, s.c, http.MethodGet,
 		restkit.Pathf("/md/v2/Securities/%s", params.Exchange), q, nil)
 }
 
@@ -84,13 +84,13 @@ type MarketDataBoardsRequest struct {
 func (s *marketDataService) Boards(
 	ctx context.Context,
 	params MarketDataBoardsRequest,
-) (*ResponseAvailableBoards, error) {
+) (ResponseAvailableBoards, error) {
 	path := restkit.Pathf(
 		"/md/v2/Securities/%s/%s/availableBoards",
 		params.Exchange,
 		params.Symbol,
 	)
-	return do[*ResponseAvailableBoards](ctx, s.c, http.MethodGet,
+	return do[ResponseAvailableBoards](ctx, s.c, http.MethodGet,
 		path, restkit.NewValues(), nil)
 }
 
@@ -124,17 +124,17 @@ type MarketDataQuotesRequest struct {
 func (s *marketDataService) Quotes(
 	ctx context.Context,
 	params MarketDataQuotesRequest,
-) (*ResponseSymbolsHeavy, error) {
+) (ResponseSymbolsHeavy, error) {
 	path := restkit.Pathf("/md/v2/Securities/%s/quotes", params.Symbols)
-	return do[*ResponseSymbolsHeavy](ctx, s.c, http.MethodGet,
+	return do[ResponseSymbolsHeavy](ctx, s.c, http.MethodGet,
 		path, heavyValues(), nil)
 }
 
 // CurrencyPairs returns the tradable currency pairs.
 func (s *marketDataService) CurrencyPairs(
 	ctx context.Context,
-) (*ResponseCurrencyPairs, error) {
-	return do[*ResponseCurrencyPairs](ctx, s.c, http.MethodGet,
+) (ResponseCurrencyPairs, error) {
+	return do[ResponseCurrencyPairs](ctx, s.c, http.MethodGet,
 		"/md/v2/Securities/currencyPairs", restkit.NewValues(), nil)
 }
 

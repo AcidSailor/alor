@@ -22,8 +22,8 @@ type StopOrdersListRequest struct {
 func (s *stopOrdersService) List(
 	ctx context.Context,
 	params StopOrdersListRequest,
-) (*ResponseStopOrdersWarpHeavy, error) {
-	return do[*ResponseStopOrdersWarpHeavy](ctx, s.c, http.MethodGet,
+) (ResponseStopOrdersWarpHeavy, error) {
+	return do[ResponseStopOrdersWarpHeavy](ctx, s.c, http.MethodGet,
 		clientPath(params.Exchange, params.Portfolio, "/stoporders"),
 		heavyValues(), nil)
 }
