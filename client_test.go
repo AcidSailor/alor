@@ -145,8 +145,8 @@ func TestGetOrdersPinsHeavyFormat(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	orders, err := c.GetOrders(context.Background(),
-		GetOrdersParams{Exchange: "MOEX", Portfolio: "D12345"})
+	orders, err := c.Orders.List(context.Background(),
+		OrdersListRequest{Exchange: "MOEX", Portfolio: "D12345"})
 	require.NoError(t, err)
 	assert.Empty(t, orders)
 	assert.Equal(t, "/md/v2/Clients/MOEX/D12345/orders", gotPath)
@@ -169,8 +169,8 @@ func TestSearchSecuritiesQuery(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	_, err = c.SearchSecurities(context.Background(),
-		SearchSecuritiesParams{Query: new("SBER")})
+	_, err = c.MarketData.Search(context.Background(),
+		MarketDataSearchRequest{Query: new("SBER")})
 	require.NoError(t, err)
 	assert.Equal(t, "SBER", gotQuery)
 	assert.Equal(t, "Heavy", gotFormat)
@@ -288,7 +288,7 @@ func TestExecDoesNotSwallowAuthFailure(t *testing.T) {
 	c, err := NewClient(srv.URL, errTokenSource{err: authErr})
 	require.NoError(t, err)
 
-	err = c.CancelOrder(context.Background(), CancelOrderParams{
+	err = c.Orders.Cancel(context.Background(), OrdersCancelRequest{
 		OrderID:   1,
 		Exchange:  "MOEX",
 		Portfolio: "D12345",

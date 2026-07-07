@@ -68,10 +68,12 @@ Single public package `alor` (top-level files) plus two subpackages: `auth/` and
   fetches the token per request and sets `Authorization: Bearer …`;
   `withReqID(id)` (per-call) sets the `X-REQID` idempotency header for order
   commands (empty id → no-op).
-- `wrappers.go` — the **read** facade (GET): `ServerTime`, `GetOrders`,
-  `SearchSecurities`, `GetTradeHistory`, `GetOrderBook`, `GetHistory`, etc.
-- `trading.go` — the **mutating** facade (POST/PUT/DELETE): order
-  place/replace/cancel, `EstimateOrder(s)`, order-group CRUD.
+- Per-service facade files — methods are grouped into service facades exposed
+  as pointer fields on `*Client`, obtained as `client.Orders`, `client.StopOrders`,
+  `client.OrderGroups`, `client.Portfolio`, `client.Trades`, `client.MarketData`
+  (each an unexported `xxxService` with a pointer receiver, wired in `NewClient`):
+  `orders.go`, `stoporders.go`, `ordergroups.go`, `portfolio.go`, `trades.go`,
+  `marketdata.go`. `ServerTime` stays a flat method on `*Client` in `client.go`.
 - `params.go` — query-key constants, `heavyValues()` (pins `?format=Heavy`),
   `setTime` helper, `itoa64` path helper. Query building uses restkit's fluent
   `Values` setters (`.Str`/`.Bool`/`.Int`/`.Int64`).
@@ -83,11 +85,11 @@ Single public package `alor` (top-level files) plus two subpackages: `auth/` and
 
 ### Facade method convention
 
-Each method takes `ctx` plus a single `XxxParams` struct: required fields are
-values, optional query filters are pointers (`*string`/`*int`/`*bool`/`*Time`,
-nil → omitted). Return types are the generated structs **directly** under their
-oapi-codegen names (e.g. `GetOrders` returns `ResponseOrdersHeavy`); no
-type-alias layer. Mutating methods carry a `ReqID string` field (X-REQID
+Each method takes `ctx` plus a single `<Service><Method>Request` struct: required
+fields are values, optional query filters are pointers (`*string`/`*int`/`*bool`/`*Time`,
+nil → omitted). Return types are a **pointer** to the generated struct under its
+oapi-codegen name (e.g. `Orders.List` returns `*ResponseOrdersHeavy`); collections
+return `[]T`; no type-alias layer. Mutating methods carry a `ReqID string` field (X-REQID
 idempotency key) in their params; bare-`"success"` endpoints return only `error`.
 Only non-deprecated operations are exposed.
 

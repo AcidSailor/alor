@@ -28,12 +28,15 @@ func TestGetOrderBookForwardsOptions(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	_, err = c.GetOrderBook(context.Background(), GetOrderBookParams{
-		Exchange:        "MOEX",
-		Symbol:          "SBER",
-		Depth:           new(20),
-		InstrumentGroup: new("TQBR"),
-	})
+	_, err = c.MarketData.OrderBook(
+		context.Background(),
+		MarketDataOrderBookRequest{
+			Exchange:        "MOEX",
+			Symbol:          "SBER",
+			Depth:           new(20),
+			InstrumentGroup: new("TQBR"),
+		},
+	)
 	require.NoError(t, err)
 	assert.Equal(t, "/md/v2/orderbooks/MOEX/SBER", gotPath)
 	assert.Equal(t, "Heavy", gotQuery.Get("format"))
@@ -56,14 +59,17 @@ func TestGetHistorySetsRequiredParams(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	_, err = c.GetHistory(context.Background(), GetHistoryParams{
-		Exchange:  "MOEX",
-		Symbol:    "SBER",
-		Tf:        "60",
-		From:      1700000000,
-		To:        1700003600,
-		CountBack: new(10),
-	})
+	_, err = c.MarketData.History(
+		context.Background(),
+		MarketDataHistoryRequest{
+			Exchange:  "MOEX",
+			Symbol:    "SBER",
+			Tf:        "60",
+			From:      1700000000,
+			To:        1700003600,
+			CountBack: new(10),
+		},
+	)
 	require.NoError(t, err)
 	assert.Equal(t, "SBER", q.Get("symbol"))
 	assert.Equal(t, "MOEX", q.Get("exchange"))
@@ -89,9 +95,9 @@ func TestPlaceLimitOrderEmptyReqIDOmitsHeader(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	_, err = c.PlaceLimitOrder(
+	_, err = c.Orders.PlaceLimit(
 		context.Background(),
-		PlaceLimitOrderParams{Order: OrdersActionsLimitTVPost{}},
+		OrdersPlaceLimitRequest{Order: OrdersActionsLimitTVPost{}},
 	)
 	require.NoError(t, err)
 	assert.Empty(t, reqIDValues, "empty reqID omits the X-REQID header")
@@ -111,8 +117,8 @@ func TestGetAvailableBoardsOmitsFormat(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	_, err = c.GetAvailableBoards(context.Background(),
-		GetAvailableBoardsParams{Exchange: "MOEX", Symbol: "SBER"})
+	_, err = c.MarketData.Boards(context.Background(),
+		MarketDataBoardsRequest{Exchange: "MOEX", Symbol: "SBER"})
 	require.NoError(t, err)
 	assert.False(t, hasFormat, "non-Heavy endpoint should not send format")
 }
@@ -139,10 +145,13 @@ func TestPlaceLimitOrderSendsReqIDAndBody(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	resp, err := c.PlaceLimitOrder(context.Background(), PlaceLimitOrderParams{
-		ReqID: "req-123",
-		Order: OrdersActionsLimitTVPost{},
-	})
+	resp, err := c.Orders.PlaceLimit(
+		context.Background(),
+		OrdersPlaceLimitRequest{
+			ReqID: "req-123",
+			Order: OrdersActionsLimitTVPost{},
+		},
+	)
 	require.NoError(t, err)
 	assert.Equal(t, http.MethodPost, gotMethod)
 	assert.Equal(t,
@@ -174,7 +183,7 @@ func TestCancelOrderNoContentPath(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	err = c.CancelOrder(context.Background(), CancelOrderParams{
+	err = c.Orders.Cancel(context.Background(), OrdersCancelRequest{
 		OrderID:   18995978560,
 		Exchange:  "MOEX",
 		Portfolio: "D12345",
@@ -204,8 +213,8 @@ func TestMutationErrorWrapping(t *testing.T) {
 	c, err := NewClient(srv.URL, staticTS())
 	require.NoError(t, err)
 
-	err = c.DeleteOrderGroup(context.Background(),
-		DeleteOrderGroupParams{OrderGroupID: "abc"})
+	err = c.OrderGroups.Delete(context.Background(),
+		OrderGroupsDeleteRequest{OrderGroupID: "abc"})
 	var respErr *ResponseError
 	require.ErrorAs(t, err, &respErr)
 	assert.Equal(t, http.StatusBadRequest, respErr.StatusCode)

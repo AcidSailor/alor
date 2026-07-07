@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net/url"
 
 	"github.com/acidsailor/restkit"
 	"golang.org/x/oauth2"
@@ -28,8 +29,8 @@ const (
 	formatHeavy = "Heavy"
 )
 
-// Client is the Alor API client. Operations are methods on the curated facade
-// in wrappers.go; each authenticates with a bearer token and returns a non-2xx
+// Client is the Alor API client. Operations are methods on the per-service facades
+// (client.Orders, client.MarketData, ...); each authenticates with a bearer token and returns a non-2xx
 // as a *[ResponseError] or any other per-call failure as a *[RequestError]
 // (cause preserved).
 //
@@ -41,6 +42,13 @@ const (
 // metrics. Callers wire it by setting the globals.
 type Client struct {
 	rkClient *restkit.Client
+
+	Orders      *ordersService
+	StopOrders  *stopOrdersService
+	OrderGroups *orderGroupsService
+	Portfolio   *portfolioService
+	Trades      *tradesService
+	MarketData  *marketDataService
 }
 
 // Option configures a Client at construction time. See [WithHTTPClient] and
@@ -112,7 +120,14 @@ func NewClient(
 	if err != nil {
 		return nil, err
 	}
-	return &Client{rkClient: rkClient}, nil
+	c := &Client{rkClient: rkClient}
+	c.Orders = &ordersService{c}
+	c.StopOrders = &stopOrdersService{c}
+	c.OrderGroups = &orderGroupsService{c}
+	c.Portfolio = &portfolioService{c}
+	c.Trades = &tradesService{c}
+	c.MarketData = &marketDataService{c}
+	return c, nil
 }
 
 // bearerAuth returns the client-wide hook that stamps each request with a fresh
@@ -191,4 +206,17 @@ func exec(
 		return nil
 	}
 	return err
+}
+
+// clientPath builds the /md/v2/Clients/{exchange}/{portfolio}/<suffix> path,
+// escaping the path parameters.
+func clientPath(exchange, portfolio, suffix string) string {
+	return "/md/v2/Clients/" + url.PathEscape(exchange) +
+		"/" + url.PathEscape(portfolio) + suffix
+}
+
+// ServerTime returns Alor's current server time as a Unix timestamp (seconds).
+func (c *Client) ServerTime(ctx context.Context) (int64, error) {
+	return do[int64](ctx, c, http.MethodGet, "/md/v2/time",
+		restkit.NewValues(), nil)
 }
