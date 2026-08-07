@@ -16,16 +16,19 @@ actions:
   # category codes that does not match what Alor actually sends. This enum has
   # broken output validation three times: members declared as JSON *numbers*
   # (a string never equals a numeric member); the empty string "" (documented in
-  # the field's own description as "нет ограничений", sent for MOEX ETFs such as
+  # the field's own description as "Нет ограничений", sent for MOEX ETFs such as
   # LQDT/TQTF) missing from the list; and "800", sent for bonds, absent from the
   # documented 0..17 range entirely. Each time, one unlisted code rejected the
   # whole `securities` / `security` response rather than one field.
   #
-  # The value is a pass-through regulatory reference code the client never
-  # branches on, and the CBR extends the categories independently of Alor's spec
-  # — so an open string is the honest wire type. The generated Go type stays
-  # `type FieldComplexProductCategory string`; only the now-unused constants
-  # (N0..N17, Unknown, Empty — no references outside models.gen.go) disappear.
+  # Never restore this enum: the codes are a CBR regulatory list extended
+  # independently of Alor's spec, the client never branches on the value, and the
+  # inherited description is deliberately left non-exhaustive. Removing the enum
+  # also collapses the generated Go type to `type FieldComplexProductCategory =
+  # string` (oapi-codegen names a primitive type only when it carries an enum),
+  # matching FieldCurrencyCode and the other enum-less string fields, and deletes
+  # the N0..N17/Unknown/Empty/LessThannil constants. Breaking; nothing referenced
+  # them.
   - target: $.components.schemas.field_ComplexProductCategory.enum
     remove: true
 
