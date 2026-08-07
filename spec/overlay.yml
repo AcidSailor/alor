@@ -10,47 +10,24 @@ info:
 # oapi-codegen v2 (kin-openapi) can digest.
 actions:
   # --- Wire-type fidelity (oapi-codegen) -----------------------------------
-  # field_ComplexProductCategory: upstream declares `type: string` but lists enum
-  # members as JSON *numbers* (0..17) alongside "Unknown" and null. A string never
-  # equals a numeric member, so the MCP server's output validation rejected every
-  # real instrument (Alor sends the category as a string, e.g. "2"). Restate the
-  # members as strings so the enum agrees with `type` and the wire form.
-  # oapi-codegen already stringifies these into the FieldComplexProductCategory
-  # constants ("0".."17"), so models.gen.go is unaffected; only the JSON-Schema
-  # enum (thus spec-deref.json) changes. Remove the numeric enum first:
-  # speakeasy's `update` appends to arrays rather than replacing, so the string
-  # list below would otherwise be tacked onto the numeric members.
+  # field_ComplexProductCategory: drop the enum, keep `type: string`.
   #
-  # The empty string "" is also a member: the field's own description documents
-  # `` as "Нет ограничений" (no restrictions), and Alor sends it for MOEX ETFs
-  # such as LQDT/TQTF. Upstream omitted it from the enum, so output validation
-  # dropped every such instrument until "" was added here.
+  # Upstream declares the field as a string but enumerates a closed list of
+  # category codes that does not match what Alor actually sends. This enum has
+  # broken output validation three times: members declared as JSON *numbers*
+  # (a string never equals a numeric member); the empty string "" (documented in
+  # the field's own description as "нет ограничений", sent for MOEX ETFs such as
+  # LQDT/TQTF) missing from the list; and "800", sent for bonds, absent from the
+  # documented 0..17 range entirely. Each time, one unlisted code rejected the
+  # whole `securities` / `security` response rather than one field.
+  #
+  # The value is a pass-through regulatory reference code the client never
+  # branches on, and the CBR extends the categories independently of Alor's spec
+  # — so an open string is the honest wire type. The generated Go type stays
+  # `type FieldComplexProductCategory string`; only the now-unused constants
+  # (N0..N17, Unknown, Empty — no references outside models.gen.go) disappear.
   - target: $.components.schemas.field_ComplexProductCategory.enum
     remove: true
-  - target: $.components.schemas.field_ComplexProductCategory
-    update:
-      enum:
-        - Unknown
-        - null
-        - ""
-        - "0"
-        - "1"
-        - "2"
-        - "3"
-        - "4"
-        - "5"
-        - "6"
-        - "7"
-        - "8"
-        - "9"
-        - "10"
-        - "11"
-        - "12"
-        - "13"
-        - "14"
-        - "15"
-        - "16"
-        - "17"
 
   # Money/quantities/greeks: Alor tags every `number` as `format: decimal`, which
   # oapi-codegen v2 cannot resolve (errors out) and would otherwise map to lossy

@@ -20,31 +20,6 @@ const (
 	StandardRisk FieldClientType = "StandardRisk"
 )
 
-// Defines values for FieldComplexProductCategory.
-const (
-	Empty       FieldComplexProductCategory = ""
-	LessThannil FieldComplexProductCategory = "<nil>"
-	N0          FieldComplexProductCategory = "0"
-	N1          FieldComplexProductCategory = "1"
-	N10         FieldComplexProductCategory = "10"
-	N11         FieldComplexProductCategory = "11"
-	N12         FieldComplexProductCategory = "12"
-	N13         FieldComplexProductCategory = "13"
-	N14         FieldComplexProductCategory = "14"
-	N15         FieldComplexProductCategory = "15"
-	N16         FieldComplexProductCategory = "16"
-	N17         FieldComplexProductCategory = "17"
-	N2          FieldComplexProductCategory = "2"
-	N3          FieldComplexProductCategory = "3"
-	N4          FieldComplexProductCategory = "4"
-	N5          FieldComplexProductCategory = "5"
-	N6          FieldComplexProductCategory = "6"
-	N7          FieldComplexProductCategory = "7"
-	N8          FieldComplexProductCategory = "8"
-	N9          FieldComplexProductCategory = "9"
-	Unknown     FieldComplexProductCategory = "Unknown"
-)
-
 // Defines values for FieldExchangeCode.
 const (
 	FieldExchangeCodeMOEX FieldExchangeCode = "MOEX"
@@ -639,7 +614,7 @@ type FieldCommission = udecimal.Decimal
 //   - `15` — Облигации иностранных эмитентов с "юрисдикцией" эмитента вне рамок разрешенных
 //   - `16` — Резерв
 //   - `17` — Все бумаги, не попадающие под тесты из Базового стандарта. Ценные бумаги без листинга на Санкт-Петербургской бирже, возникшие в результате корпоративных событий
-type FieldComplexProductCategory string
+type FieldComplexProductCategory = string
 
 // FieldCurrencyCode Код валюты расчетов
 type FieldCurrencyCode = string
