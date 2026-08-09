@@ -238,4 +238,4 @@ API Alor.
 
 ## License
 
-[GNU AGPL v3](./LICENSE).
+[Apache-2.0](./LICENSE).
