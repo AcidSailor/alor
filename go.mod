@@ -1,13 +1,13 @@
 module github.com/acidsailor/alor
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/acidsailor/restkit v0.2.1
 	github.com/google/uuid v1.6.0
 	github.com/quagmt/udecimal v1.10.1
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/oauth2 v0.36.0
+	golang.org/x/oauth2 v0.37.0
 )
 
 require (
