@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -218,4 +219,56 @@ func TestMutationErrorWrapping(t *testing.T) {
 	var respErr *ResponseError
 	require.ErrorAs(t, err, &respErr)
 	assert.Equal(t, http.StatusBadRequest, respErr.StatusCode)
+}
+
+// TestTradesHistoryDateFrom verifies the optional *Time dateFrom filter on both
+// trade-history endpoints: a set value encodes as RFC3339 UTC, nil and zero
+// leave the key absent.
+func TestTradesHistoryDateFrom(t *testing.T) {
+	var q url.Values
+	srv := httptest.NewServer(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			q = r.URL.Query()
+			_, _ = w.Write([]byte("[]"))
+		}),
+	)
+	defer srv.Close()
+
+	c, err := NewClient(srv.URL, staticTS())
+	require.NoError(t, err)
+	ctx := context.Background()
+	msk := time.FixedZone("MSK", 3*3600)
+	from := &Time{time.Date(2021, 10, 13, 12, 0, 0, 0, msk)}
+
+	cases := []struct {
+		name string
+		in   *Time
+		want string
+		set  bool
+	}{
+		{"value", from, "2021-10-13T09:00:00Z", true},
+		{"nil", nil, "", false},
+		{"zero", &Time{}, "", false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name+"/history", func(t *testing.T) {
+			_, err := c.Trades.History(ctx, TradesHistoryRequest{
+				Exchange: "MOEX", Portfolio: "D1", DateFrom: tc.in,
+				Side: new("buy"),
+			})
+			require.NoError(t, err)
+			assert.Equal(t, tc.set, q.Has("dateFrom"))
+			assert.Equal(t, tc.want, q.Get("dateFrom"))
+			assert.Equal(t, "buy", q.Get("side"), "chain continues")
+		})
+		t.Run(tc.name+"/symbol", func(t *testing.T) {
+			_, err := c.Trades.SymbolHistory(ctx, TradesSymbolHistoryRequest{
+				Exchange: "MOEX", Portfolio: "D1", Symbol: "SBER",
+				DateFrom: tc.in,
+			})
+			require.NoError(t, err)
+			assert.Equal(t, tc.set, q.Has("dateFrom"))
+			assert.Equal(t, tc.want, q.Get("dateFrom"))
+		})
+	}
 }

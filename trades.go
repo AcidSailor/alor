@@ -85,8 +85,8 @@ func (s *tradesService) History(
 		Bool(keyOrderByTradeDate, params.OrderByTradeDate).
 		Bool(keyDescending, params.Descending).
 		Bool(keyWithRepo, params.WithRepo).
-		Str(keySide, params.Side)
-	q = setTime(q, keyDateFrom, params.DateFrom)
+		Str(keySide, params.Side).
+		Param(keyDateFrom, params.DateFrom)
 	return do[ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
 }
 
@@ -125,8 +125,8 @@ func (s *tradesService) SymbolHistory(
 		Bool(keyOrderByTradeDate, params.OrderByTradeDate).
 		Bool(keyDescending, params.Descending).
 		Bool(keyWithRepo, params.WithRepo).
-		Str(keySide, params.Side)
-	q = setTime(q, keyDateFrom, params.DateFrom)
+		Str(keySide, params.Side).
+		Param(keyDateFrom, params.DateFrom)
 	return do[ResponseTradesV2Heavy](ctx, s.c, http.MethodGet, path, q, nil)
 }
 

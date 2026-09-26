@@ -64,14 +64,3 @@ func heavyValues() restkit.Values {
 	v.Set(keyFormat, formatHeavy)
 	return v
 }
-
-// setTime sets key to the Alor date-time rendering of t when non-nil and
-// non-zero, else leaves it absent. The generic restkit.Values setters cannot
-// carry the package-local Time type, so date-times use the embedded Set behind
-// this nil/zero check.
-func setTime(v restkit.Values, key string, t *Time) restkit.Values {
-	if t != nil && !t.IsZero() {
-		v.Set(key, t.text())
-	}
-	return v
-}

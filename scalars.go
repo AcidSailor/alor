@@ -67,9 +67,20 @@ func (t Time) MarshalJSON() ([]byte, error) {
 
 // text renders the value in UTC as RFC3339Nano — the form Alor accepts for its
 // date/date-time query inputs (documented UTC). Total: time.Format never fails,
-// so setTime (params.go), which has no error channel, can encode through it
-// directly.
+// so QueryValue, which has no error channel, can encode through it directly.
 func (t Time) text() string { return t.UTC().Format(time.RFC3339Nano) }
+
+// QueryValue implements restkit.QueryValuer so an optional *Time request field
+// chains through restkit.Values.Param: nil or zero reports ok=false and the key
+// stays absent, otherwise the value renders via text. Pointer receiver on
+// purpose — a nil *Time must reach this method rather than be boxed as a
+// non-nil value.
+func (t *Time) QueryValue() (string, bool) {
+	if t == nil || t.IsZero() {
+		return "", false
+	}
+	return t.text(), true
+}
 
 // MarshalText implements encoding.TextMarshaler over text, overriding the
 // promoted time.Time.MarshalText so an outgoing value is always normalised to
