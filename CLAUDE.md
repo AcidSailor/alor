@@ -75,8 +75,9 @@ Single public package `alor` (top-level files) plus two subpackages: `auth/` and
   `orders.go`, `stoporders.go`, `ordergroups.go`, `portfolio.go`, `trades.go`,
   `marketdata.go`. `ServerTime` stays a flat method on `*Client` in `client.go`.
 - `params.go` — query-key constants, `heavyValues()` (pins `?format=Heavy`),
-  `setTime` helper, `itoa64` path helper. Query building uses restkit's fluent
-  `Values` setters (`.Str`/`.Bool`/`.Int`/`.Int64`).
+  `itoa64` path helper. Query building uses restkit's fluent `Values` setters
+  (`.Str`/`.Bool`/`.Int`/`.Int64`); optional `*Time` filters chain via
+  `.Param` through `(*Time).QueryValue`.
 - `scalars.go` — hand-written `Time` type (lenient `UnmarshalJSON` for Alor's
   zone-less timestamps + the `9999-…` .NET MaxValue "never expires" sentinel;
   `NeverExpires()` detects it).

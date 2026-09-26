@@ -158,3 +158,21 @@ func TestUUIDStrictDecode(t *testing.T) {
 	err := json.Unmarshal([]byte(`{"id":""}`), &v)
 	require.Error(t, err)
 }
+
+// TestTimeQueryValue covers the restkit.QueryValuer contract behind
+// Values.Param: nil and zero skip the key, a set value renders in UTC.
+func TestTimeQueryValue(t *testing.T) {
+	var nilTime *Time
+	s, ok := nilTime.QueryValue()
+	assert.False(t, ok, "nil skips")
+	assert.Empty(t, s)
+
+	s, ok = (&Time{}).QueryValue()
+	assert.False(t, ok, "zero skips")
+	assert.Empty(t, s)
+
+	msk := time.FixedZone("MSK", 3*3600)
+	s, ok = (&Time{time.Date(2021, 10, 13, 12, 0, 0, 0, msk)}).QueryValue()
+	assert.True(t, ok)
+	assert.Equal(t, "2021-10-13T09:00:00Z", s)
+}
