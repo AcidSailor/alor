@@ -10667,17 +10667,10 @@
                       "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                       "properties": {
                         "statusCode": {
-                          "allOf": [
-                            {
-                              "type": "integer",
-                              "format": "int32",
-                              "example": 200,
-                              "description": "HTTP-код ответа"
-                            },
-                            {
-                              "example": 400
-                            }
-                          ]
+                          "type": "integer",
+                          "format": "int32",
+                          "example": 400,
+                          "description": "HTTP-код ответа"
                         },
                         "body": {
                           "type": "object",
@@ -10924,17 +10917,10 @@
                       "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                       "properties": {
                         "statusCode": {
-                          "allOf": [
-                            {
-                              "type": "integer",
-                              "format": "int32",
-                              "example": 200,
-                              "description": "HTTP-код ответа"
-                            },
-                            {
-                              "example": 400
-                            }
-                          ]
+                          "type": "integer",
+                          "format": "int32",
+                          "example": 400,
+                          "description": "HTTP-код ответа"
                         },
                         "body": {
                           "type": "object",
@@ -11180,17 +11166,10 @@
                       "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                       "properties": {
                         "statusCode": {
-                          "allOf": [
-                            {
-                              "type": "integer",
-                              "format": "int32",
-                              "example": 200,
-                              "description": "HTTP-код ответа"
-                            },
-                            {
-                              "example": 400
-                            }
-                          ]
+                          "type": "integer",
+                          "format": "int32",
+                          "example": 400,
+                          "description": "HTTP-код ответа"
                         },
                         "body": {
                           "type": "object",
@@ -11428,17 +11407,10 @@
                       "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                       "properties": {
                         "statusCode": {
-                          "allOf": [
-                            {
-                              "type": "integer",
-                              "format": "int32",
-                              "example": 200,
-                              "description": "HTTP-код ответа"
-                            },
-                            {
-                              "example": 400
-                            }
-                          ]
+                          "type": "integer",
+                          "format": "int32",
+                          "example": 400,
+                          "description": "HTTP-код ответа"
                         },
                         "body": {
                           "type": "object",
@@ -12180,17 +12152,10 @@
                       "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                       "properties": {
                         "statusCode": {
-                          "allOf": [
-                            {
-                              "type": "integer",
-                              "format": "int32",
-                              "example": 200,
-                              "description": "HTTP-код ответа"
-                            },
-                            {
-                              "example": 400
-                            }
-                          ]
+                          "type": "integer",
+                          "format": "int32",
+                          "example": 400,
+                          "description": "HTTP-код ответа"
                         },
                         "body": {
                           "type": "object",
@@ -12436,17 +12401,10 @@
                       "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                       "properties": {
                         "statusCode": {
-                          "allOf": [
-                            {
-                              "type": "integer",
-                              "format": "int32",
-                              "example": 200,
-                              "description": "HTTP-код ответа"
-                            },
-                            {
-                              "example": 400
-                            }
-                          ]
+                          "type": "integer",
+                          "format": "int32",
+                          "example": 400,
+                          "description": "HTTP-код ответа"
                         },
                         "body": {
                           "type": "object",
@@ -12705,17 +12663,10 @@
                       "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                       "properties": {
                         "statusCode": {
-                          "allOf": [
-                            {
-                              "type": "integer",
-                              "format": "int32",
-                              "example": 200,
-                              "description": "HTTP-код ответа"
-                            },
-                            {
-                              "example": 400
-                            }
-                          ]
+                          "type": "integer",
+                          "format": "int32",
+                          "example": 400,
+                          "description": "HTTP-код ответа"
                         },
                         "body": {
                           "type": "object",
@@ -13005,17 +12956,10 @@
                       "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                       "properties": {
                         "statusCode": {
-                          "allOf": [
-                            {
-                              "type": "integer",
-                              "format": "int32",
-                              "example": 200,
-                              "description": "HTTP-код ответа"
-                            },
-                            {
-                              "example": 400
-                            }
-                          ]
+                          "type": "integer",
+                          "format": "int32",
+                          "example": 400,
+                          "description": "HTTP-код ответа"
                         },
                         "body": {
                           "type": "object",
@@ -13452,17 +13396,10 @@
                       "example": "BadRequest"
                     },
                     "status": {
-                      "allOf": [
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "example": 200,
-                          "description": "HTTP-код ответа"
-                        },
-                        {
-                          "example": 400
-                        }
-                      ]
+                      "type": "integer",
+                      "format": "int32",
+                      "example": 400,
+                      "description": "HTTP-код ответа"
                     },
                     "detail": {
                       "type": "string",
@@ -13597,17 +13534,10 @@
                       "example": "BadRequest"
                     },
                     "status": {
-                      "allOf": [
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "example": 200,
-                          "description": "HTTP-код ответа"
-                        },
-                        {
-                          "example": 400
-                        }
-                      ]
+                      "type": "integer",
+                      "format": "int32",
+                      "example": 400,
+                      "description": "HTTP-код ответа"
                     },
                     "detail": {
                       "type": "string",
@@ -13761,17 +13691,10 @@
                       "example": "BadRequest"
                     },
                     "status": {
-                      "allOf": [
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "example": 200,
-                          "description": "HTTP-код ответа"
-                        },
-                        {
-                          "example": 400
-                        }
-                      ]
+                      "type": "integer",
+                      "format": "int32",
+                      "example": 400,
+                      "description": "HTTP-код ответа"
                     },
                     "detail": {
                       "type": "string",
@@ -13916,17 +13839,10 @@
                       "example": "BadRequest"
                     },
                     "status": {
-                      "allOf": [
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "example": 200,
-                          "description": "HTTP-код ответа"
-                        },
-                        {
-                          "example": 400
-                        }
-                      ]
+                      "type": "integer",
+                      "format": "int32",
+                      "example": 400,
+                      "description": "HTTP-код ответа"
                     },
                     "detail": {
                       "type": "string",
@@ -14008,17 +13924,10 @@
                       "example": "BadRequest"
                     },
                     "status": {
-                      "allOf": [
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "example": 200,
-                          "description": "HTTP-код ответа"
-                        },
-                        {
-                          "example": 400
-                        }
-                      ]
+                      "type": "integer",
+                      "format": "int32",
+                      "example": 400,
+                      "description": "HTTP-код ответа"
                     },
                     "detail": {
                       "type": "string",
@@ -15470,43 +15379,22 @@
         "description": "HTTP-код ответа"
       },
       "field_HTTPCode200": {
-        "allOf": [
-          {
-            "type": "integer",
-            "format": "int32",
-            "example": 200,
-            "description": "HTTP-код ответа"
-          },
-          {
-            "example": 200
-          }
-        ]
+        "type": "integer",
+        "format": "int32",
+        "example": 200,
+        "description": "HTTP-код ответа"
       },
       "field_HTTPCode400": {
-        "allOf": [
-          {
-            "type": "integer",
-            "format": "int32",
-            "example": 200,
-            "description": "HTTP-код ответа"
-          },
-          {
-            "example": 400
-          }
-        ]
+        "type": "integer",
+        "format": "int32",
+        "example": 400,
+        "description": "HTTP-код ответа"
       },
       "field_HTTPCode401": {
-        "allOf": [
-          {
-            "type": "integer",
-            "format": "int32",
-            "example": 200,
-            "description": "HTTP-код ответа"
-          },
-          {
-            "example": 401
-          }
-        ]
+        "type": "integer",
+        "format": "int32",
+        "example": 401,
+        "description": "HTTP-код ответа"
       },
       "field_IdentifierAccount": {
         "type": "string",
@@ -21410,17 +21298,10 @@
             "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
             "properties": {
               "statusCode": {
-                "allOf": [
-                  {
-                    "type": "integer",
-                    "format": "int32",
-                    "example": 200,
-                    "description": "HTTP-код ответа"
-                  },
-                  {
-                    "example": 400
-                  }
-                ]
+                "type": "integer",
+                "format": "int32",
+                "example": 400,
+                "description": "HTTP-код ответа"
               },
               "body": {
                 "type": "object",
@@ -21882,17 +21763,10 @@
             "example": "BadRequest"
           },
           "status": {
-            "allOf": [
-              {
-                "type": "integer",
-                "format": "int32",
-                "example": 200,
-                "description": "HTTP-код ответа"
-              },
-              {
-                "example": 400
-              }
-            ]
+            "type": "integer",
+            "format": "int32",
+            "example": 400,
+            "description": "HTTP-код ответа"
           },
           "detail": {
             "type": "string",
@@ -51065,17 +50939,10 @@
                   "example": "BadRequest"
                 },
                 "status": {
-                  "allOf": [
-                    {
-                      "type": "integer",
-                      "format": "int32",
-                      "example": 200,
-                      "description": "HTTP-код ответа"
-                    },
-                    {
-                      "example": 400
-                    }
-                  ]
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 400,
+                  "description": "HTTP-код ответа"
                 },
                 "detail": {
                   "type": "string",
@@ -51104,17 +50971,10 @@
                   "description": "Сообщение, полученное в ответ на предыдущий запрос с таким же значением `X-ALOR-REQID`",
                   "properties": {
                     "statusCode": {
-                      "allOf": [
-                        {
-                          "type": "integer",
-                          "format": "int32",
-                          "example": 200,
-                          "description": "HTTP-код ответа"
-                        },
-                        {
-                          "example": 400
-                        }
-                      ]
+                      "type": "integer",
+                      "format": "int32",
+                      "example": 400,
+                      "description": "HTTP-код ответа"
                     },
                     "body": {
                       "type": "object",
@@ -51184,17 +51044,10 @@
                   "description": "Клиентский идентификатор команды. В качестве идентификатора требуется уникальная случайная строка. Если уже приходил запрос с таким идентификатором, то команда не будет исполнена повторно."
                 },
                 "httpCode": {
-                  "allOf": [
-                    {
-                      "type": "integer",
-                      "format": "int32",
-                      "example": 200,
-                      "description": "HTTP-код ответа"
-                    },
-                    {
-                      "example": 200
-                    }
-                  ]
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 200,
+                  "description": "HTTP-код ответа"
                 },
                 "message": {
                   "allOf": [
@@ -51226,17 +51079,10 @@
                   "description": "Клиентский идентификатор команды. В качестве идентификатора требуется уникальная случайная строка. Если уже приходил запрос с таким идентификатором, то команда не будет исполнена повторно."
                 },
                 "httpCode": {
-                  "allOf": [
-                    {
-                      "type": "integer",
-                      "format": "int32",
-                      "example": 200,
-                      "description": "HTTP-код ответа"
-                    },
-                    {
-                      "example": 200
-                    }
-                  ]
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 200,
+                  "description": "HTTP-код ответа"
                 },
                 "message": {
                   "allOf": [
@@ -51273,17 +51119,10 @@
                   "description": "Клиентский идентификатор команды. В качестве идентификатора требуется уникальная случайная строка. Если уже приходил запрос с таким идентификатором, то команда не будет исполнена повторно."
                 },
                 "httpCode": {
-                  "allOf": [
-                    {
-                      "type": "integer",
-                      "format": "int32",
-                      "example": 200,
-                      "description": "HTTP-код ответа"
-                    },
-                    {
-                      "example": 200
-                    }
-                  ]
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 200,
+                  "description": "HTTP-код ответа"
                 },
                 "message": {
                   "allOf": [
@@ -51320,17 +51159,10 @@
                   "description": "Клиентский идентификатор команды. В качестве идентификатора требуется уникальная случайная строка. Если уже приходил запрос с таким идентификатором, то команда не будет исполнена повторно."
                 },
                 "httpCode": {
-                  "allOf": [
-                    {
-                      "type": "integer",
-                      "format": "int32",
-                      "example": 200,
-                      "description": "HTTP-код ответа"
-                    },
-                    {
-                      "example": 200
-                    }
-                  ]
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 200,
+                  "description": "HTTP-код ответа"
                 },
                 "message": {
                   "allOf": [
@@ -51367,17 +51199,10 @@
                   "description": "Клиентский идентификатор команды. В качестве идентификатора требуется уникальная случайная строка. Если уже приходил запрос с таким идентификатором, то команда не будет исполнена повторно."
                 },
                 "httpCode": {
-                  "allOf": [
-                    {
-                      "type": "integer",
-                      "format": "int32",
-                      "example": 200,
-                      "description": "HTTP-код ответа"
-                    },
-                    {
-                      "example": 400
-                    }
-                  ]
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 400,
+                  "description": "HTTP-код ответа"
                 },
                 "message": {
                   "allOf": [
@@ -59110,17 +58935,10 @@
                   ]
                 },
                 "httpCode": {
-                  "allOf": [
-                    {
-                      "type": "integer",
-                      "format": "int32",
-                      "example": 200,
-                      "description": "HTTP-код ответа"
-                    },
-                    {
-                      "example": 200
-                    }
-                  ]
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 200,
+                  "description": "HTTP-код ответа"
                 },
                 "requestGuid": {
                   "type": "string",
@@ -59155,17 +58973,10 @@
                   "description": "Клиентский идентификатор подписки. В качестве идентификатора требуется уникальная случайная строка. Значение в возвращаемых в рамках подписки сообщениях равно значению поля `guid`, переданному при отправке команды."
                 },
                 "httpCode": {
-                  "allOf": [
-                    {
-                      "type": "integer",
-                      "format": "int32",
-                      "example": 200,
-                      "description": "HTTP-код ответа"
-                    },
-                    {
-                      "example": 401
-                    }
-                  ]
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 401,
+                  "description": "HTTP-код ответа"
                 },
                 "message": {
                   "allOf": [

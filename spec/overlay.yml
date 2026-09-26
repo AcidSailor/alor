@@ -155,6 +155,36 @@ actions:
     update:
       $ref: '#/components/schemas/field_Message'
 
+  # HTTP status codes: same allOf-alias defect as FORTS, on an int32. Upstream
+  # defines field_HTTPCode200/400/401 as allOf[$ref field_HTTPCode, {example}],
+  # so oapi-codegen emits a *struct* embedding the int32 alias and decoding the
+  # bare-number `status` / `statusCode` Alor returns fails ("cannot unmarshal
+  # number into Go struct field ...status"). Flatten each to a plain int32.
+  - target: $.components.schemas.field_HTTPCode200.allOf
+    remove: true
+  - target: $.components.schemas.field_HTTPCode200
+    update:
+      type: integer
+      format: int32
+      example: 200
+      description: 'HTTP-код ответа'
+  - target: $.components.schemas.field_HTTPCode400.allOf
+    remove: true
+  - target: $.components.schemas.field_HTTPCode400
+    update:
+      type: integer
+      format: int32
+      example: 400
+      description: 'HTTP-код ответа'
+  - target: $.components.schemas.field_HTTPCode401.allOf
+    remove: true
+  - target: $.components.schemas.field_HTTPCode401
+    update:
+      type: integer
+      format: int32
+      example: 401
+      description: 'HTTP-код ответа'
+
   # --- Drop the WebSocket subscription surface -----------------------------
   # Alor models WS/CWS subscriptions as `trace:` operations on whitespace-padded
   # `/ws   ` and `/cws   ` path keys — the only trace operations in the spec.
