@@ -28,3 +28,17 @@ func TestResponseOrderGroupCreationDecodesStringMessage(t *testing.T) {
 	var success ResponseOrderGroupCreationSuccess
 	require.NoError(t, json.Unmarshal([]byte(body), &success))
 }
+
+// Alor returns `status` / `statusCode` as a bare JSON number; the generated
+// types must decode it (regression for the allOf-int32-alias -> struct defect).
+func TestResponseDecodesNumericHTTPCode(t *testing.T) {
+	var groupErr ResponseOrderGroupCreationError
+	require.NoError(t, json.Unmarshal([]byte(`{"status":400}`), &groupErr))
+	require.EqualValues(t, 400, *groupErr.Status)
+
+	var action ResponseOrderActionCode400CommandAPI
+	require.NoError(t, json.Unmarshal(
+		[]byte(`{"oldResponse":{"statusCode":400}}`), &action,
+	))
+	require.EqualValues(t, 400, *action.OldResponse.StatusCode)
+}

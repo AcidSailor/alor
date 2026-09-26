@@ -676,15 +676,8 @@ type FieldFuturesNameShort = string
 // FieldFuturesTicker Тикер фьючерсного контракта
 type FieldFuturesTicker = string
 
-// FieldHTTPCode HTTP-код ответа
-type FieldHTTPCode = int32
-
-// FieldHTTPCode400 defines model for field_HTTPCode400.
-type FieldHTTPCode400 struct {
-	// Embedded struct due to allOf(#/components/schemas/field_HTTPCode)
-	FieldHTTPCode `yaml:",inline"`
-	// Embedded fields due to inline allOf schema
-}
+// FieldHTTPCode400 HTTP-код ответа
+type FieldHTTPCode400 = int32
 
 // FieldISIN Идентификатор инструмента согласно стандарту ISO 6166
 type FieldISIN = string
@@ -1657,6 +1650,8 @@ type ResponseOrderActionCode400CommandAPI struct {
 			// OrderNumber Уникальный идентификатор заявки
 			OrderNumber *FieldIdentifierOrderCommon `json:"orderNumber,omitempty"`
 		} `json:"body,omitempty"`
+
+		// StatusCode HTTP-код ответа
 		StatusCode *FieldHTTPCode400 `json:"statusCode,omitempty"`
 	} `json:"oldResponse,omitempty"`
 }
@@ -1715,7 +1710,9 @@ type ResponseOrderBookHeavy struct {
 // ResponseOrderGroupCreationError Пример ответа на некорректный запрос на создание группы заявок
 type ResponseOrderGroupCreationError struct {
 	// Detail Описание ошибки
-	Detail *string           `json:"detail,omitempty"`
+	Detail *string `json:"detail,omitempty"`
+
+	// Status HTTP-код ответа
 	Status *FieldHTTPCode400 `json:"status,omitempty"`
 
 	// Title Описание кода ошибки

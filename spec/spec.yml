@@ -2541,17 +2541,20 @@ components:
       example: 200
       description: 'HTTP-код ответа'
     field_HTTPCode200:
-      allOf:
-        - $ref: '#/components/schemas/field_HTTPCode'
-        - example: 200
+      type: integer
+      format: int32
+      example: 200
+      description: 'HTTP-код ответа'
     field_HTTPCode400:
-      allOf:
-        - $ref: '#/components/schemas/field_HTTPCode'
-        - example: 400
+      type: integer
+      format: int32
+      example: 400
+      description: 'HTTP-код ответа'
     field_HTTPCode401:
-      allOf:
-        - $ref: '#/components/schemas/field_HTTPCode'
-        - example: 401
+      type: integer
+      format: int32
+      example: 401
+      description: 'HTTP-код ответа'
     field_IdentifierAccount:
       type: string
       example: L01-00000F00
