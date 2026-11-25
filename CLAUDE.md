@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 Go HTTP client for the [Alor broker API](https://alor.dev/docs/). Module
-`github.com/acidsailor/alor` (Go 1.26). A curated facade over the shared
+`github.com/acidsailor/alor` (Go 1.27). A curated facade over the shared
 [`restkit`](https://github.com/acidsailor/restkit) HTTP-JSON transport; response
 models are code-generated from Alor's OpenAPI spec by
 [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen) (types only — plain
