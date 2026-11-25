@@ -34,7 +34,7 @@ variants (the facade requests `Heavy` only), OAuth code-flow bootstrap, GraphQL.
 go get github.com/acidsailor/alor
 ```
 
-Requires Go 1.26+.
+Requires Go 1.27+.
 
 ## Quickstart
 
